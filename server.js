@@ -16,21 +16,29 @@ app.listen(3000, function() {
 });
 
 
-app.post("/receiveKey", jsonParser, function (req,res) {
-  console.log("POST /receiveKey");
+app.post("/sendKey", jsonParser, function (req,res) {
+  console.log("POST /sendKey");
+  res.sendStatus(200);
 });
 
-app.get("/dealHand", jsonParser, function (req,res) {
-  console.log("GET /dealHand");
+app.get("/getHand", jsonParser, function (req,res) {
+  var hand = generateHand();
+  console.log("GET /getHand");
+  console.log(hand);
+  res.json(hand);
+  res.sendStatus(200);
 });
 
-function generateHand() {
-
+function generateHand(handsize) {
+  handsize = handsize || 3; //if no handsize default to 3
+  var hand = [];
+  for (var i = 0; i<handsize; i++) {
+    hand.push(Math.floor(Math.random() * 15 + 1));
+  }
+  return hand;
 }
 
-app.post("/receiveCard", jsonParser, function (req,res) {
-  console.log("POST /receiveCard");
+app.post("/sendCard", jsonParser, function (req,res) {
+  console.log("POST /sendCard");
+  res.sendStatus(200);
 });
-
-
-

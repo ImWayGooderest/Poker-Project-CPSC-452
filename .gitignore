@@ -52,3 +52,4 @@ client/.idea/client.iml
 *.pem
 client/__pycache__/RSA.cpython-34.pyc
 node_modules/
+*.xml___jb_tmp___
