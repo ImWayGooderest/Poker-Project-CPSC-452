@@ -2,11 +2,14 @@
 var express = require("express"),
   app = express(),
   bodyParser = require("body-parser");
+
 //body-parser set up
-var jsonParser = bodyParser.json();
-var urlencodedParser = bodyParser.urlencoded({
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
   extended: false
-});
+}));
+var playerCount = 0;
+
 // app.use(express.static(__dirname));
 
 
@@ -16,12 +19,12 @@ app.listen(3000, function() {
 });
 
 
-app.post("/sendKey", jsonParser, function (req,res) {
+app.post("/sendKey", function (req,res) {
   console.log("POST /sendKey");
   res.sendStatus(200);
 });
 
-app.get("/getHand", jsonParser, function (req,res) {
+app.get("/getHand", function (req,res) {
   var hand = generateHand();
   console.log("GET /getHand");
   console.log(hand);
@@ -38,7 +41,28 @@ function generateHand(handsize) {
   return hand;
 }
 
-app.post("/sendCard", jsonParser, function (req,res) {
+app.post("/sendCard", function (req,res) {
   console.log("POST /sendCard");
   res.sendStatus(200);
+});
+
+app.get('/login', function (req, res){
+  if(playerCount === 0){
+    //req.mySession.username = 'Player 1';
+    playerCount++;
+    console.log("Player " + playerCount +" logged in the game!");
+  }
+  else if (playerCount === 1)  {
+    //req.mySession.username = 'Player 2';
+    playerCount++;
+    console.log("Player " + playerCount +" logged in the game!");
+  } else {
+    res.send("ERROR: Too many players!!!!")
+  }
+
+  res.sendStatus(200);
+});
+
+app.get('/logout', function (req, res) {
+  //req.mySession.reset();
 });

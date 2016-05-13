@@ -24,11 +24,10 @@ def getHand():
 
 def sendSessionKey():
 	test = requests.post("http://localhost:3000/sendKey", params=sessionKey)
-	pass
 
 def playCard():
 	test = requests.get("http://localhost:3000/sendCard", params=card)
-	pass
+
 
 def main():
 	hand = getHand()
@@ -36,6 +35,8 @@ def main():
 
 
 if __name__ == "__main__":
+	r =requests.get("http://localhost:3000/login")
+	print(r.cookies['username'])
 	main()
 
 
