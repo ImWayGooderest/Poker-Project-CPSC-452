@@ -4,10 +4,14 @@ var express = require("express"),
   bodyParser = require("body-parser");
 
 //body-parser set up
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-  extended: false
-}));
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({
+//   extended: false
+// }));
+// app.use(bodyParser.text({
+//   defaultCharset: "ascii"
+// }));
+app.use(bodyParser.raw());
 var playerCount = 0;
 
 // app.use(express.static(__dirname));
@@ -21,6 +25,7 @@ app.listen(3000, function() {
 
 app.post("/sendKey", function (req,res) {
   console.log("POST /sendKey");
+  console.log(req.body);
   res.sendStatus(200);
 });
 

@@ -1,4 +1,4 @@
-import RSA, requests, sys
+import RSA, requests, sys, json
 
 # methods of response object
 # r.text text
@@ -22,8 +22,10 @@ def getHand():
 	print(hand.json())
 	return hand.json()
 
-def sendSessionKey():
-	test = requests.post("http://localhost:3000/sendKey", params=sessionKey)
+def sendSessionKey(publicKey):
+	data = {}
+	data["session_key"] = publicKey
+	test = requests.post("http://localhost:3000/sendKey", data=publicKey)
 
 def playCard():
 	test = requests.get("http://localhost:3000/sendCard", params=card)
@@ -35,9 +37,10 @@ def main():
 
 
 if __name__ == "__main__":
-	r =requests.get("http://localhost:3000/login")
-	print(r.cookies['username'])
-	main()
+	cipher = RSA.RSA()
+	private_key, public_key = cipher.getKey()
+	sendSessionKey(public_key)
+	# main()
 
 
 
