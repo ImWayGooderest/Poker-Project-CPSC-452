@@ -19,7 +19,7 @@ import RSA, requests, sys, json
 # }
 def getHand():
 	hand = requests.get("http://localhost:3000/getHand")
-	print(hand.json())
+	#print(hand.json())
 	return hand.json()
 
 def sendSessionKey(publicKey):
@@ -27,7 +27,7 @@ def sendSessionKey(publicKey):
 	data["session_key"] = publicKey
 	test = requests.post("http://localhost:3000/sendKey", data=publicKey)
 
-def playCard():
+def playCard(card):
 	test = requests.get("http://localhost:3000/sendCard", params=card)
 
 
@@ -40,6 +40,10 @@ if __name__ == "__main__":
 	cipher = RSA.RSA()
 	private_key, public_key = cipher.getKey()
 	sendSessionKey(public_key)
+	myHand = getHand()	#assuming the randomized 3 cards return as a list
+	userInput = input("This is currently your hand, please select one: " + str(myHand))
+	#print(myHand)	#somewhere here have user input?
+	playCard(userInput)		#have the user input be passed on to the server
 	# main()
 
 
