@@ -3,18 +3,22 @@ var express = require("express"),
   app = express(),
   bodyParser = require("body-parser");
 
-//body-parser set up
-// app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({
-//   extended: false
-// }));
-// app.use(bodyParser.text({
-//   defaultCharset: "ascii"
-// }));
-app.use(bodyParser.raw());
-var playerCount = 0;
+function Player()
+{
+  this.session_key= 0;
+  this.hand = [];
+  this.score = 0;
+}
 
-// app.use(express.static(__dirname));
+var player1 = new Player();
+var player2 = new Player();
+// body-parser set up
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: false
+}));
+
+
 
 
 app.listen(3000, function() {
@@ -53,7 +57,7 @@ app.post("/sendCard", function (req,res) {
 
 app.get('/login', function (req, res){
   if(playerCount === 0){
-    //req.mySession.username = 'Player 1';
+    player1.session_key =
     playerCount++;
     console.log("Player " + playerCount +" logged in the game!");
   }

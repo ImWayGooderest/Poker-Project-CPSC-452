@@ -8,7 +8,7 @@ class RSA():
 
 	# code sample from https://gist.github.com/lkdocs/6519378
 	def getKey(self):
-		key = Crypto.PublicKey.RSA.generate(2048, e=65537)
+		key = Crypto.PublicKey.RSA.generate(1024, e=65537)
 		public_key = key.publickey().exportKey("DER")
 		private_key = key.exportKey("DER")
 		return private_key, public_key
