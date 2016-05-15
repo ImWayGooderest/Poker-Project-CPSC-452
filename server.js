@@ -5,7 +5,8 @@ var express = require("express"),
 
 function Player()
 {
-  this.session_key= 0;
+  this.session_key= 0;//the key actually used for encryption
+  this.session_key_base64=0;
   this.hand = [];
   this.score = 0;
 }
@@ -27,20 +28,6 @@ app.listen(3000, function() {
 });
 
 
-app.post("/sendKey", function (req,res) {
-  console.log("POST /sendKey");
-  console.log(req.body);
-  res.sendStatus(200);
-});
-
-app.get("/getHand", function (req,res) {
-  var hand = generateHand();
-  console.log("GET /getHand");
-  console.log(hand);
-  res.json(hand);
-  res.sendStatus(200);
-});
-
 function generateHand(handsize) {
   handsize = handsize || 3; //if no handsize default to 3
   var hand = [];
@@ -50,26 +37,49 @@ function generateHand(handsize) {
   return hand;
 }
 
+
+//NOT TESTED
 app.post("/sendCard", function (req,res) {
   console.log("POST /sendCard");
+  var player = verify_user(req);
+  if(player) {
+    //removed req.card from player.hand and say ok or maybe send back the new hand
+  } else {
+    res.send("ERROR: Invalid player")
+  }
   res.sendStatus(200);
 });
 
-app.get('/login', function (req, res){
-  if(playerCount === 0){
-    player1.session_key =
-    playerCount++;
-    console.log("Player " + playerCount +" logged in the game!");
+//NOT TESTED
+function verify_user(req) {
+  var playerNumber = 0;
+  if(player1.session_key_base64 === req.body.session_key_base64) {
+    playerNumber = player1;
+  } else if(player2.session_key_base64 === req.body.session_key_base64) {
+    playerNumber = player2;
   }
-  else if (playerCount === 1)  {
-    //req.mySession.username = 'Player 2';
-    playerCount++;
-    console.log("Player " + playerCount +" logged in the game!");
+  return playerNumber;
+}
+
+
+//input is session key, output is player's hand
+app.post('/login', function (req, res){
+  if(player1.session_key === 0) {
+    player1.session_key_base64 = req.body.session_key_base64;
+    player1.session_key = new Buffer(req.body.session_key_base64, 'base64').toString("ascii");
+    player1.hand = generateHand();
+    console.log("Player 1 logged in the game!");
+    res.json(player1.hand);
+  }
+  else if (player2.session_key === 0) {
+    player2.session_key_base64 = req.body.session_key_base64;
+    player2.session_key = new Buffer(req.body.session_key_base64, 'base64').toString("ascii");
+    player2.hand = generateHand();
+    console.log("Player 2 logged in the game!");
+    res.json(player2.hand)
   } else {
     res.send("ERROR: Too many players!!!!")
   }
-
-  res.sendStatus(200);
 });
 
 app.get('/logout', function (req, res) {
