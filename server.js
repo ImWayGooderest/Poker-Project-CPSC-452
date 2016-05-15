@@ -1,7 +1,7 @@
-/* jshint node: true, curly: true, eqeqeq: true, forin: true, immed: true, indent: 4, latedef: true, newcap: true, nonew: true, quotmark: double, undef: true, unused: true, strict: true, trailing: true */
 var express = require("express"),
   app = express(),
-  bodyParser = require("body-parser");
+  bodyParser = require("body-parser"),
+  ursa = require("ursa");
 
 function Player()
 {
@@ -30,9 +30,9 @@ app.listen(3000, function() {
 
 function generateHand(handsize) {
   handsize = handsize || 3; //if no handsize default to 3
-  var hand = [];
+  var hand = "";
   for (var i = 0; i<handsize; i++) {
-    hand.push(Math.floor(Math.random() * 15 + 1));
+    hand += Math.floor(Math.random() * 15 + 1) + " ";
   }
   return hand;
 }
@@ -61,6 +61,11 @@ function verify_user(req) {
   return playerNumber;
 }
 
+function encrypt(public_key, data) {
+  var key = ursa.createPublicKey(public_key);
+  return key.encrypt(data,"utf8","base64");
+}
+
 
 //input is session key, output is player's hand
 app.post('/login', function (req, res){
@@ -69,14 +74,14 @@ app.post('/login', function (req, res){
     player1.session_key = new Buffer(req.body.session_key_base64, 'base64').toString("ascii");
     player1.hand = generateHand();
     console.log("Player 1 logged in the game!");
-    res.json(player1.hand);
+    res.status(200).json(encrypt(player1.session_key, player1.hand));
   }
   else if (player2.session_key === 0) {
     player2.session_key_base64 = req.body.session_key_base64;
     player2.session_key = new Buffer(req.body.session_key_base64, 'base64').toString("ascii");
     player2.hand = generateHand();
     console.log("Player 2 logged in the game!");
-    res.json(player2.hand)
+    res.status(200).json(encrypt(player2.session_key, player2.hand));
   } else {
     res.send("ERROR: Too many players!!!!")
   }

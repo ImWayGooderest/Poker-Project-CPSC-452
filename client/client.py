@@ -1,9 +1,9 @@
 import RSA, requests, sys, json, base64
 
-# global vars for now
-private_key = 0
-public_key = 0
-session_key = 0
+#global vars for now
+private_key = b""
+public_key = b""
+
 # methods of response object
 # r.text text
 # r.content binary content
@@ -45,7 +45,9 @@ def main():
 	global public_key, private_key
 	cipher = RSA.RSA()
 	private_key, public_key = cipher.getKey()
-	myHand = loginAndGetHand()
+	myHand = base64.b64decode(bytes(loginAndGetHand(), encoding="ascii"))
+	# test stuff
+	myHand = cipher.decrypt(myHand, private_key).decode().split() #decrypts, then bytestring to string, then convert string to list
 	# myHand = getHand()	#assuming the randomized 3 cards return as a list
 	userInput = input("This is currently your hand, please select one: " + str(myHand))
 	# #print(myHand)	#somewhere here have user input?
