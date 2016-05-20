@@ -36,18 +36,23 @@ def loginAndGetHand():
 	return decryptBase64toJSON(hand.content)
 
 def playCard(card):
+	print("You selected: " + str(card))
 	data = {}
 	data['card'] = card
+	response = requests.post("http://localhost:3000/sendCard", json=prepareData(data))
+	newHand = decryptBase64toJSON(response.content)
 	while True:
-		newHand = requests.post("http://localhost:3000/sendCard", json=prepareData(data))
-		if newHand.content == b'"INVALID CARD"':
-			print("Invalid")
+		if newHand.get("err", 0) is not 0:
+			print(newHand["err"])
+			return 0
 		else:
-			newHand = decryptBase64toJSON(newHand.content)
 			if(newHand["msg"] == 0):
 				print("waiting for other player to play")
 				time.sleep(5)
+				response = requests.post("http://localhost:3000/checkForWinner", json=prepareData())
+				newHand["msg"] = decryptBase64toJSON(response.content)["msg"]
 			else:
+				print(newHand["msg"])
 				return newHand["hand"]
 
 # attaches session key only accepts dicts for now
@@ -65,8 +70,9 @@ def main():
 	# test stuff
 	while len(myHand) > 0:
 		userInput = input("This is currently your hand, please select one: " + str(myHand) + "\n") #probably a better way to write this
-		myHand = playCard(int(userInput)) # need
-
+		tempHand = playCard(myHand[int(userInput)])
+		if tempHand is not 0: # need
+			myHand = tempHand
 
 
 
