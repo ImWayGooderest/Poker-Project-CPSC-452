@@ -1,4 +1,4 @@
-import RSA, requests, sys, json, base64, atexit
+import RSA, requests, sys, json, base64, atexit, time
 
 #global vars for now
 private_key = b""
@@ -63,7 +63,8 @@ def main():
 		tempHand = playCard(myHand[int(userInput)])
 		if tempHand is not 0:
 			myHand = tempHand
-
+	
+	time.sleep(30)
 	sys.exit()
 
 
