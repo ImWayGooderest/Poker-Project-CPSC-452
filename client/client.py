@@ -4,10 +4,6 @@ import RSA, requests, sys, json, base64, atexit
 private_key = b""
 public_key = b""
 
-# def getHand():
-# 	hand = requests.get("http://localhost:3000/getHand")
-# 	print(hand.json())
-# 	return hand.json()
 def decryptBase64toJSON(bytes):
 	cipher = RSA.RSA()
 	JSONstring = cipher.decrypt(base64.b64decode(bytes), private_key).decode("utf-8")
@@ -15,8 +11,11 @@ def decryptBase64toJSON(bytes):
 
 def loginAndGetHand():
 	hand = requests.post("http://localhost:3000/login", json=prepareData())
-	# print("Hand returned was: " + hand.content)
-	return decryptBase64toJSON(hand.content)
+	if hand.status_code is not 200:
+		print("Game is full!")
+		sys.exit()
+	else:
+		return decryptBase64toJSON(hand.content)
 
 def playCard(card):
 	print("You selected: " + str(card))
@@ -34,6 +33,9 @@ def playCard(card):
 				response = requests.post("http://localhost:3000/checkForWinner", json=prepareData())
 				newHand["msg"] = decryptBase64toJSON(response.content)["msg"]
 			else:
+				response = requests.post("http://localhost:3000/getOpponentsCard", json=prepareData())
+				newHand["opponentCard"] = decryptBase64toJSON(response.content)["opponentCard"]
+				print("You played: " + str(card) + "\n" + "Your opponent played: " + str(newHand["opponentCard"]))
 				print(newHand["msg"])
 				return newHand["hand"]
 
@@ -53,13 +55,13 @@ def main():
 	# test stuff
 	while len(myHand) > 0:
 		while True:
-			userInput = input("This is currently your hand, please select one: " + str(myHand) + "\n") #probably a better way to write this
+			userInput = input("This is currently your hand, please select one: " + str(myHand) + "\n")
 			if not userInput.isdigit() or int(userInput) < 0 or int(userInput) >= len(myHand):
 				print("Please enter a valid index (0,1,2)")
 			else:
-				break;
+				break
 		tempHand = playCard(myHand[int(userInput)])
-		if tempHand is not 0: # need
+		if tempHand is not 0:
 			myHand = tempHand
 
 	

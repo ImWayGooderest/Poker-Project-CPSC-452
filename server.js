@@ -8,7 +8,7 @@ function Player()
   this.session_key= 0;//the key actually used for encryption
   this.session_key_base64=0;
   this.hand = [];
-  this.card1 = ""; //It looks like the cards are saved as strings
+  this.card1 = "";
   this.card2 = "";
   this.card3 = "";
   this.score = 0;
@@ -73,11 +73,21 @@ app.post("/sendCard", function (req,res) {
   }
 });
 
-app.post("/checkForWInner", function (req,res) {
+app.post("/checkForWinner", function (req,res) {
   console.log("POST /checkForWinner");
   var player = verify_user(req);
   if(player) {
     res.status(200).send(encrypt(player.session_key, JSON.stringify({msg: checkWinner(player)})))
+  } else {
+    console.log("INVALID PLAYER");
+    res.status(500).json({err:"INVALID PLAYER"});
+  }
+});
+app.post("/getOpponentsCard", function (req,res) {
+  console.log("POST /getOpponentsCard");
+  var player = verify_user(req);
+  if(player) {
+    res.status(200).send(encrypt(player.session_key, JSON.stringify({opponentCard: getOpponentsCard(player)})))
   } else {
     console.log("INVALID PLAYER");
     res.status(500).json({err:"INVALID PLAYER"});
@@ -92,6 +102,28 @@ function incrementRound() {
     roundCounter = 0;
   }
 }
+
+function getOpponentsCard(player) {
+  if (round == 2 && player1.card1 > 0 && player2.card1 > 0) {
+    if(player.card1 == player1.card1)
+      return player2.card1;
+    else
+      return player1.card1;
+  } else if (round == 3 && player1.card2 > 0 && player2.card2 > 0) {
+    if (player.card2 == player1.card2)
+      return player2.card2;
+    else
+      return player1.card2;
+  } else if (round == 4 && player1.card3 > 0 && player2.card3 > 0) {
+    if (player.card3 == player1.card3)
+      return player2.card3;
+    else
+      return player1.card3;
+  } else { //both players haven't played a card
+    return 0
+  }
+}
+
 function checkWinner(player) {
   var winner;
   if (round == 1 && player1.card1 > 0 && player2.card1 > 0) {
@@ -108,10 +140,15 @@ function checkWinner(player) {
     return "You Tied"
   } else if(winner.session_key_base64 == player.session_key_base64) {
     incrementRound();
-    player.score += 1;
-    return "You Won The Round"
+    if(round >= 4)
+      return "You Won The Game! Congratulations!";
+    else
+      return "You Won The Round"
   } else{
     incrementRound();
+    if(round >= 4)
+      return "You Lost The Game!";
+    else
     return "You Lose The Round"
   }
 }
@@ -123,20 +160,23 @@ function getWinner(player1Card, player2Card) {
   } else if (player1Card < player2Card) {
     player2.score += 1;
     return player2
-  } else { //need to figure out what to do with ties
+  } else {
     return 0
   }
 }
 
 app.get("/gameWinner", function (req, res) {
-  if (player1.score == player2.score){
-    res.json({end: 'Tie Game' });
-  }
-  else if (player1.score > player2.score){
-    res.json({end: 'Player 1 Wins' });
-  }
-  else {
-    res.json({end: 'Player 2 Wins' });
+  var player = verify_user(req);
+  if(player) {
+    if (player1.score == player2.score) {
+      res.json({end: 'Tie Game'});
+    }
+    else if (player1.score > player2.score) {
+      res.json({end: 'Player 1 Wins'});
+    }
+    else {
+      res.json({end: 'Player 2 Wins'});
+    }
   }
 });
 
@@ -173,7 +213,7 @@ app.post('/login', function (req, res){
     console.log("Player 2 logged in the game!");
     res.status(200).send(encrypt(player2.session_key,JSON.stringify(player2.hand)));
   } else {
-    res.status(500).send(encrypt(player.session_key, JSON.stringify({err: "INVALID ROUND"})));
+    res.status(500).send(JSON.stringify({err: "INVALID PLAYER"}));
 
   }
 });
@@ -185,5 +225,6 @@ app.get('/logout', function (req, res) {
   player1 = new Player();
   player2 = new Player();
   round = 1;
+  roundCounter = 0;
   res.sendStatus(200)
 });
