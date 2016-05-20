@@ -109,10 +109,10 @@ function checkWinner(player) {
   } else if(winner.session_key_base64 == player.session_key_base64) {
     incrementRound();
     player.score += 1;
-    return "You Won"
+    return "You Won The Round"
   } else{
     incrementRound();
-    return "You Lose"
+    return "You Lose The Round"
   }
 }
 
@@ -127,6 +127,19 @@ function getWinner(player1Card, player2Card) {
     return 0
   }
 }
+
+app.get("/gameWinner", function (req, res) {
+  if (player1.score == player2.score){
+    res.status(200).JSON.stringify({end:"Tie Game"});
+  }
+  else if (player1.score > player2.score){
+    res.status(200).JSON.stringify({end:"Player 1 Wins"});
+  }
+  else {
+    res.status(200).JSON.stringify({end:"Player 2 Wins"});
+  }
+});
+
 /*
 app.post("/findWinner", function (req,res) {
 	console.log("POST /sendCard");

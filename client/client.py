@@ -1,4 +1,4 @@
-import RSA, requests, sys, json, base64, time, atexit
+import RSA, requests, sys, json, base64, atexit
 
 #global vars for now
 private_key = b""
@@ -31,7 +31,6 @@ def playCard(card):
 		else:
 			if(newHand["msg"] == 0):
 				print("waiting for other player to play")
-				time.sleep(5)
 				response = requests.post("http://localhost:3000/checkForWinner", json=prepareData())
 				newHand["msg"] = decryptBase64toJSON(response.content)["msg"]
 			else:
@@ -53,10 +52,17 @@ def main():
 	myHand = loginAndGetHand()
 	# test stuff
 	while len(myHand) > 0:
-		userInput = input("This is currently your hand, please select one: " + str(myHand) + "\n") #probably a better way to write this
+		while True:
+			userInput = input("This is currently your hand, please select one: " + str(myHand) + "\n") #probably a better way to write this
+			if int(userInput) < 0 or int(userInput) >= len(myHand):
+				print("Please enter a valid index (0,1,2)")
+			else:
+				break;
 		tempHand = playCard(myHand[int(userInput)])
 		if tempHand is not 0: # need
 			myHand = tempHand
+
+	print (requests.get("http://localhost:3000/gameWinner").content["end"])
 
 
 def logout():
