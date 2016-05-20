@@ -32,6 +32,7 @@ app.listen(3000, function() {
   console.log("Poker Project app listening on port 3000!");
 });
 
+//input is handsize output is a list of 3 numbers from 1-15
 
 function generateHand(handsize) {
   handsize = handsize || 3; //if no handsize default to 3
@@ -73,6 +74,8 @@ app.post("/sendCard", function (req,res) {
   }
 });
 
+
+//this function is called by the client waiting for other player over and over until the other player plays a card
 app.post("/checkForWinner", function (req,res) {
   console.log("POST /checkForWinner");
   var player = verify_user(req);
@@ -83,6 +86,7 @@ app.post("/checkForWinner", function (req,res) {
     res.status(500).json({err:"INVALID PLAYER"});
   }
 });
+//this function just returns the opponents card played for output to client
 app.post("/getOpponentsCard", function (req,res) {
   console.log("POST /getOpponentsCard");
   var player = verify_user(req);
@@ -94,7 +98,7 @@ app.post("/getOpponentsCard", function (req,res) {
   }
 });
 
-
+//increments the round only after both players have played
 function incrementRound() {
   roundCounter += 1;
   if (roundCounter >= 2) {
@@ -152,7 +156,7 @@ function checkWinner(player) {
     return "You Lose The Round"
   }
 }
-
+//called by checkWinner() to return who played the higher card 
 function getWinner(player1Card, player2Card) {
   if(player1Card > player2Card) {
     player1.score += 1;
@@ -165,7 +169,7 @@ function getWinner(player1Card, player2Card) {
   }
 }
 
-
+//input is session_key in base64 output. function checks which player is talking to server, returns 0
 function verify_user(req) {
   var playerNumber = 0;
   if(player1.session_key_base64 === req.body.session_key_base64) {
@@ -176,6 +180,7 @@ function verify_user(req) {
   return playerNumber;
 }
 
+//encrypts to base64
 function encrypt(public_key, data) {
   var key = ursa.createPublicKey(public_key);
   return key.encrypt(data,"utf8","base64");
@@ -203,6 +208,8 @@ app.post('/login', function (req, res){
   }
 });
 
+//when a user quits reset everything
+//client will need to generate new public/private key pair
 app.get('/logout', function (req, res) {
   console.log("GOT IT");
   delete player1;

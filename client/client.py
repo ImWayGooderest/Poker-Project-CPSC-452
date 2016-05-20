@@ -4,11 +4,13 @@ import RSA, requests, sys, json, base64, atexit, time
 private_key = b""
 public_key = b""
 
+# decrypts encrypted base64 string to json and then to a python dict
 def decryptBase64toJSON(bytes):
 	cipher = RSA.RSA()
 	JSONstring = cipher.decrypt(base64.b64decode(bytes), private_key).decode("utf-8")
 	return json.loads(JSONstring)
 
+# signs in and receives a hand
 def loginAndGetHand():
 	hand = requests.post("http://localhost:3000/login", json=prepareData())
 	if hand.status_code is not 200:
@@ -17,6 +19,8 @@ def loginAndGetHand():
 	else:
 		return decryptBase64toJSON(hand.content)
 
+
+# this function is called everytime the player plays a card
 def playCard(card):
 	print("You selected: " + str(card))
 	data = {}
@@ -24,23 +28,25 @@ def playCard(card):
 	response = requests.post("http://localhost:3000/sendCard", json=prepareData(data))
 	newHand = decryptBase64toJSON(response.content)
 	while True:
-		if newHand.get("err", 0) is not 0:
+		if newHand.get("err", 0) is not 0: # if there's an error print it to screen and go back to main
 			print(newHand["err"])
 			return 0
 		else:
-			if(newHand["msg"] == 0):
+			if(newHand["msg"] == 0): # msg is 0 when other player didn't play yet. Becomes "You won the round" etc when the other player goes
 				print("waiting for other player to play")
 				response = requests.post("http://localhost:3000/checkForWinner", json=prepareData())
 				newHand["msg"] = decryptBase64toJSON(response.content)["msg"]
-			else:
+			else: # msg contains who won
 				response = requests.post("http://localhost:3000/getOpponentsCard", json=prepareData())
-				newHand["opponentCard"] = decryptBase64toJSON(response.content)["opponentCard"]
+				newHand["opponentCard"] = decryptBase64toJSON(response.content)["opponentCard"] # get the card the opponent played to print to screen
 				print("You played: " + str(card) + "\n" + "Your opponent played: " + str(newHand["opponentCard"]))
 				print(newHand["msg"])
 				return newHand["hand"]
 
 
-# attaches session key only accepts dicts for now
+# attaches session key in base64 to every POST to server
+# make sure to call this function when sending a POST
+# e.g. response = requests.post("http://localhost:3000/checkForWinner", json=prepareData())
 def prepareData(data=None):
 	if(data==None):
 		data = {}
