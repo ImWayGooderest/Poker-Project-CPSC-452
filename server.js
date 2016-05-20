@@ -140,65 +140,6 @@ app.get("/gameWinner", function (req, res) {
   }
 });
 
-/*
-app.post("/findWinner", function (req,res) {
-	console.log("POST /sendCard");
-	var player = verify_user(req);
-	if(player) {
-		player1Counter = 0;
-		player2Counter = 0;
-		draw = 0;
-		
-		//Check Card 1
-		if (player1.card1 > player2.card1){
-			player1Counter += 1;
-		}
-		else if (player1.card1 < player2.card1){
-			player2Counter += 1;
-		}
-		else if (player1.card1 == player2.card1){
-			draw += 1;
-		}
-		
-		//Check Card 2
-		if (player1.card2 > player2.card2){
-			player1Counter += 1;
-		}
-		else if (player1.card2 < player2.card2){
-			player2Counter += 1;
-		}
-		else if (player1.card2 == player2.card2){
-			draw += 1;
-		}
-		
-		//Check Card 3
-		if (player1.card3 > player2.card3){
-			player1Counter += 1;
-		}
-		else if (player1.card3 < player2.card3){
-			player2Counter += 1;
-		}
-		else if (player1.card3 == player2.card3){
-			draw += 1;
-		}
-		
-		
-		//Find Winner
-		if (player1Counter > player2Counter) {
-			winner = Player_1;
-		}
-		else if (player1Counter < player2Counter) {
-			winner = Player_2;
-		}
-		else if (player1Counter == player2Counter) {
-			winner = Draw;
-		}
-	} else {
-		res.send("ERROR: Invalid player")
-    }
-	 res.status(200).json(encrypt(winner));
-})
-*/
 
 function verify_user(req) {
   var playerNumber = 0;
