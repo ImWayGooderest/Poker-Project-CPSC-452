@@ -1,4 +1,4 @@
-import RSA, requests, sys, json, base64
+import RSA, requests, sys, json, base64, time
 
 #global vars for now
 private_key = b""
@@ -38,11 +38,17 @@ def loginAndGetHand():
 def playCard(card):
 	data = {}
 	data['card'] = card
-	newHand = requests.post("http://localhost:3000/sendCard", json=prepareData(data))
-	newHand = decryptBase64toJSON(newHand.content)
-	if(newHand["msg"] == 0):
-		print("waiting for other player to play")
-	return newHand["hand"]
+	while True:
+		newHand = requests.post("http://localhost:3000/sendCard", json=prepareData(data))
+		if newHand.content == b'"INVALID CARD"':
+			print("Invalid")
+		else:
+			newHand = decryptBase64toJSON(newHand.content)
+			if(newHand["msg"] == 0):
+				print("waiting for other player to play")
+				time.sleep(5)
+			else:
+				return newHand["hand"]
 
 # attaches session key only accepts dicts for now
 def prepareData(data=None):
@@ -58,8 +64,8 @@ def main():
 	myHand = loginAndGetHand()
 	# test stuff
 	while len(myHand) > 0:
-		userInput = input("This is currently your hand, please select one: " + str(myHand)) #probably a better way to write this
-		myHand = playCard(myHand[int(userInput)]) # need
+		userInput = input("This is currently your hand, please select one: " + str(myHand) + "\n") #probably a better way to write this
+		myHand = playCard(int(userInput)) # need
 
 
 
