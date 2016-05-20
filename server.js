@@ -140,13 +140,13 @@ function checkWinner(player) {
     return "You Tied"
   } else if(winner.session_key_base64 == player.session_key_base64) {
     incrementRound();
-    if(round >= 4)
+    if((round >= 3 && roundCounter == 1) || round >= 4)
       return "You Won The Game! Congratulations!";
     else
       return "You Won The Round"
   } else{
     incrementRound();
-    if(round >= 4)
+    if((round >= 3 && roundCounter == 1)  || round >= 4)
       return "You Lost The Game!";
     else
     return "You Lose The Round"
@@ -164,21 +164,6 @@ function getWinner(player1Card, player2Card) {
     return 0
   }
 }
-
-app.get("/gameWinner", function (req, res) {
-  var player = verify_user(req);
-  if(player) {
-    if (player1.score == player2.score) {
-      res.json({end: 'Tie Game'});
-    }
-    else if (player1.score > player2.score) {
-      res.json({end: 'Player 1 Wins'});
-    }
-    else {
-      res.json({end: 'Player 2 Wins'});
-    }
-  }
-});
 
 
 function verify_user(req) {

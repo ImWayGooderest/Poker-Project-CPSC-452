@@ -64,9 +64,6 @@ def main():
 		if tempHand is not 0:
 			myHand = tempHand
 
-	
-	win = json.loads(requests.get("http://localhost:3000/gameWinner").content.decode('ascii'))
-	print(win["end"])
 
 
 def logout():
