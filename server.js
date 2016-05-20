@@ -224,5 +224,10 @@ app.post('/login', function (req, res){
 });
 
 app.get('/logout', function (req, res) {
-  //req.mySession.reset();
+  console.log("GOT IT");
+  delete player1;
+  delete player2;
+  player1 = new Player();
+  player2 = new Player();
+  round = 1;
 });
