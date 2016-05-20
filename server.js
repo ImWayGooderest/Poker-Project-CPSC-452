@@ -43,6 +43,7 @@ function generateHand(handsize) {
 //input player card output new player hand
 app.post("/sendCard", function (req,res) {
   console.log("POST /sendCard");
+  var winOrLose = "";
   var player = verify_user(req);
   var cardPlayed = req.body.card;
   if(player) {
@@ -59,7 +60,7 @@ app.post("/sendCard", function (req,res) {
         res.status(200).json("INVALID ROUND")
       }
       player.hand.splice(index,1); //remove played card from hand
-      res.status(200).send(encrypt(player.session_key, JSON.stringify(player.hand)))
+      res.status(200).send(encrypt(player.session_key, JSON.stringify({hand: player.hand, msg: checkWinner(player)})))
     } else {
       console.log("INVALID CARD");
       res.status(200).json("INVALID CARD")
@@ -70,6 +71,39 @@ app.post("/sendCard", function (req,res) {
   }
 });
 
+function checkWinner(player) {
+  var winner;
+  if (round == 1 && player1.card1 > 0 && player2.card1 > 0) {
+    winner = getWinner(player1.card1, player2.card1)
+  } else if (round == 2 && player1.card2 > 0 && player2.card2 > 0) {
+    winner = getWinner(player1.card2, player2.card2)
+  } else if (round == 3 && player1.card3 > 0 && player2.card3 > 0) {
+    winner = getWinner(player1.card3, player2.card3)
+  } else { //both players haven't played a card
+    return 0
+  }
+  if(winner = 0) {// 0 means tie
+    return "You Tied"
+  } else if(winner.session_key_base64 == player.session_key_base64) {
+    return "You Won"
+  } else{
+    return "You Lose"
+  }
+}
+
+function getWinner(player1Card, player2Card) {
+  if(player1Card > player2Card) {
+    player1.score += 1;
+    round += 1;
+    return player1
+  } else if (player1Card < player2Card) {
+    player2.score += 1;
+    round += 1;
+    return player2
+  } else { //need to figure out what to do with ties
+    return 0
+  }
+}
 /*
 app.post("/findWinner", function (req,res) {
 	console.log("POST /sendCard");

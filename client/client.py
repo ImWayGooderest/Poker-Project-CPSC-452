@@ -39,8 +39,10 @@ def playCard(card):
 	data = {}
 	data['card'] = card
 	newHand = requests.post("http://localhost:3000/sendCard", json=prepareData(data))
-	# print("sendCard returned: " + result.json())
-	return decryptBase64toJSON(newHand.content)
+	newHand = decryptBase64toJSON(newHand.content)
+	if(newHand["msg"] == 0):
+		print("waiting for other player to play")
+	return newHand["hand"]
 
 # attaches session key only accepts dicts for now
 def prepareData(data=None):
