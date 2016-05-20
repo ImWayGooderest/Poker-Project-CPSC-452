@@ -8,14 +8,15 @@ function Player()
   this.session_key= 0;//the key actually used for encryption
   this.session_key_base64=0;
   this.hand = [];
-  //this.card1 = ""; //It looks like the cards are saved as strings
-  //this.card2 = "";
-  //this.card3 = "";
+  this.card1 = ""; //It looks like the cards are saved as strings
+  this.card2 = "";
+  this.card3 = "";
   this.score = 0;
 }
-
 var player1 = new Player();
 var player2 = new Player();
+var round = 1; //what round it is
+
 // body-parser set up
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -33,30 +34,40 @@ app.listen(3000, function() {
 
 function generateHand(handsize) {
   handsize = handsize || 3; //if no handsize default to 3
-  var hand = "";
+  var hand = [];
   for (var i = 0; i<handsize; i++) {
-    hand += Math.floor(Math.random() * 15 + 1) + " ";
+    hand.push(Math.floor(Math.random() * 15 + 1));
   }
   return hand;
 }
-
-
-//NOT TESTED
+//input player card output new player hand
 app.post("/sendCard", function (req,res) {
   console.log("POST /sendCard");
   var player = verify_user(req);
+  var cardPlayed = req.body.card;
   if(player) {
-    //removed req.card from player.hand and say ok or maybe send back the new hand
-	/*if (player.card1 == ""){player.card1 = reg.card;}
-	else if (player.card2 == ""){player.card2 = reg.card;}
-	else if (player.card3 == ""){player.card3 = reg.card;}
-	else {res.send("ERROR: More than 3 rounds")}
-	*/
+    var index = player.hand.indexOf(cardPlayed);
+    if(index > -1){ //if card exists in hand
+      if(round == 1) {
+        player.card1 = cardPlayed;
+      } else if (round ==2) {
+        player.card2 = cardPlayed;
+      } else if (round ==3) {
+        player.card3 = cardPlayed;
+      } else {
+        console.log("INVALID ROUND");
+        res.status(200).json("INVALID ROUND")
+      }
+      player.hand.splice(index,1); //remove played card from hand
+      res.status(200).send(encrypt(player.session_key, JSON.stringify(player.hand)))
+    } else {
+      console.log("INVALID CARD");
+      res.status(200).json("INVALID CARD")
+    }
   } else {
+    console.log("INVALID PLAYER");
     res.send("ERROR: Invalid player")
   }
-  //player.hand = [];
-  res.sendStatus(200);
 });
 
 /*
@@ -119,7 +130,6 @@ app.post("/findWinner", function (req,res) {
 })
 */
 
-//NOT TESTED
 function verify_user(req) {
   var playerNumber = 0;
   if(player1.session_key_base64 === req.body.session_key_base64) {
@@ -143,14 +153,14 @@ app.post('/login', function (req, res){
     player1.session_key = new Buffer(req.body.session_key_base64, 'base64').toString("ascii");
     player1.hand = generateHand();
     console.log("Player 1 logged in the game!");
-    res.status(200).json(encrypt(player1.session_key, player1.hand));
+    res.status(200).send(encrypt(player1.session_key,JSON.stringify(player1.hand)));
   }
   else if (player2.session_key === 0) {
     player2.session_key_base64 = req.body.session_key_base64;
     player2.session_key = new Buffer(req.body.session_key_base64, 'base64').toString("ascii");
     player2.hand = generateHand();
     console.log("Player 2 logged in the game!");
-    res.status(200).json(encrypt(player2.session_key, player2.hand));
+    res.status(200).send(encrypt(player2.session_key,JSON.stringify(player2.hand)));
   } else {
     res.send("ERROR: Too many players!!!!")
   }

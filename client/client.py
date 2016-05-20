@@ -25,16 +25,24 @@ public_key = b""
 # 	hand = requests.get("http://localhost:3000/getHand")
 # 	print(hand.json())
 # 	return hand.json()
+def decryptBase64toJSON(bytes):
+	cipher = RSA.RSA()
+	JSONstring = cipher.decrypt(base64.b64decode(bytes), private_key).decode("utf-8")
+	return json.loads(JSONstring)
 
 def loginAndGetHand():
 	hand = requests.post("http://localhost:3000/login", json=prepareData())
-	print(hand.json())
-	return hand.json()
+	# print("Hand returned was: " + hand.content)
+	return decryptBase64toJSON(hand.content)
 
 def playCard(card):
-	test = requests.post("http://localhost:3000/sendCard", json=prepareData(card))
+	data = {}
+	data['card'] = card
+	newHand = requests.post("http://localhost:3000/sendCard", json=prepareData(data))
+	# print("sendCard returned: " + result.json())
+	return decryptBase64toJSON(newHand.content)
 
-# attaches session key and eventually will encrypt
+# attaches session key only accepts dicts for now
 def prepareData(data=None):
 	if(data==None):
 		data = {}
@@ -45,12 +53,15 @@ def main():
 	global public_key, private_key
 	cipher = RSA.RSA()
 	private_key, public_key = cipher.getKey()
-	myHand = base64.b64decode(bytes(loginAndGetHand(), encoding="ascii"))
+	myHand = loginAndGetHand()
 	# test stuff
-	#while counter !=3:
-		myHand = cipher.decrypt(myHand, private_key).decode().split() #decrypts, then bytestring to string, then convert string to list
-		# myHand = getHand()	#assuming the randomized 3 cards return as a list
-		userInput = input("This is currently your hand, please select one: " + str(myHand))
+	while len(myHand) > 0:
+		userInput = input("This is currently your hand, please select one: " + str(myHand)) #probably a better way to write this
+		myHand = playCard(myHand[int(userInput)]) # need
+
+
+
+
 		# playCard(userInput)		#have the user input be passed on to the server
 		#counter += 1
 		#userInput = input("Get another hand?" Yes or No?)
