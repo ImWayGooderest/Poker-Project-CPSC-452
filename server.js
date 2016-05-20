@@ -108,6 +108,7 @@ function checkWinner(player) {
     return "You Tied"
   } else if(winner.session_key_base64 == player.session_key_base64) {
     incrementRound();
+    player.score += 1;
     return "You Won"
   } else{
     incrementRound();
