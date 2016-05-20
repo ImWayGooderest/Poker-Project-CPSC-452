@@ -64,6 +64,8 @@ def main():
 		if tempHand is not 0:
 			myHand = tempHand
 
+	sys.exit()
+
 
 
 def logout():
