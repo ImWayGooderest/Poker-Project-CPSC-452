@@ -1,4 +1,4 @@
-import RSA, requests, sys, json, base64, time
+import RSA, requests, sys, json, base64, time, atexit
 
 #global vars for now
 private_key = b""
@@ -50,6 +50,7 @@ def playCard(card):
 			else:
 				return newHand["hand"]
 
+
 # attaches session key only accepts dicts for now
 def prepareData(data=None):
 	if(data==None):
@@ -67,7 +68,11 @@ def main():
 		userInput = input("This is currently your hand, please select one: " + str(myHand) + "\n") #probably a better way to write this
 		myHand = playCard(int(userInput)) # need
 
+def logout():
+	print("Bye")
+	requests.get("http://localhost:3000/logout")
 
+atexit.register(logout)
 
 
 		# playCard(userInput)		#have the user input be passed on to the server
