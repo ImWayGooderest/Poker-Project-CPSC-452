@@ -50,6 +50,6 @@ Temporary Items
 *.name
 client/.idea/client.iml
 *.pem
-client/__pycache__/RSA.cpython-34.pyc
+client/__pycache__/
 node_modules/
 *.xml___jb_tmp___
