@@ -103,7 +103,7 @@ function checkWinner(player) {
   } else { //both players haven't played a card
     return 0
   }
-  if(winner = 0) {// 0 means tie
+  if(winner == 0) {// 0 means tie
     incrementRound();
     return "You Tied"
   } else if(winner.session_key_base64 == player.session_key_base64) {
