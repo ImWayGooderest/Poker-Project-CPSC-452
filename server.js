@@ -231,4 +231,5 @@ app.get('/logout', function (req, res) {
   player1 = new Player();
   player2 = new Player();
   round = 1;
+  res.sendStatus(200)
 });
