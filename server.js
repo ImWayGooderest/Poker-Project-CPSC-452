@@ -130,13 +130,13 @@ function getWinner(player1Card, player2Card) {
 
 app.get("/gameWinner", function (req, res) {
   if (player1.score == player2.score){
-    res.status(200).JSON.stringify({end:"Tie Game"});
+    res.json({end: 'Tie Game' });
   }
   else if (player1.score > player2.score){
-    res.status(200).JSON.stringify({end:"Player 1 Wins"});
+    res.json({end: 'Player 1 Wins' });
   }
   else {
-    res.status(200).JSON.stringify({end:"Player 2 Wins"});
+    res.json({end: 'Player 2 Wins' });
   }
 });
 

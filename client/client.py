@@ -54,7 +54,7 @@ def main():
 	while len(myHand) > 0:
 		while True:
 			userInput = input("This is currently your hand, please select one: " + str(myHand) + "\n") #probably a better way to write this
-			if int(userInput) < 0 or int(userInput) >= len(myHand):
+			if not userInput.isdigit() or int(userInput) < 0 or int(userInput) >= len(myHand):
 				print("Please enter a valid index (0,1,2)")
 			else:
 				break;
@@ -62,7 +62,9 @@ def main():
 		if tempHand is not 0: # need
 			myHand = tempHand
 
-	print (requests.get("http://localhost:3000/gameWinner").content["end"])
+	
+	win = json.loads(requests.get("http://localhost:3000/gameWinner").content.decode('ascii'))
+	print(win["end"])
 
 
 def logout():
