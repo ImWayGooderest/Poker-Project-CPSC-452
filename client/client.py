@@ -72,18 +72,6 @@ def logout():
 atexit.register(logout)
 
 
-		# playCard(userInput)		#have the user input be passed on to the server
-		#counter += 1
-		#userInput = input("Get another hand?" Yes or No?)
-		#if (userInput == "Yes"):
-			#myHand = base64.b64decode(bytes(getHand(), encoding="ascii")) #Need new function simply for getting the hand and encoding it separate from logging in the first time
-	#userInput = input("Would you like to find who won?")
-	#if (userInput == "Yes"):
-		#winner = request.post("http://localhost:3000/findWinner", json=prepareData())
-		#print("The winner was:" + winner)
-
-
-
 
 if __name__ == "__main__":
 	main()
