@@ -44,13 +44,13 @@ def playCard(card):
 				return newHand["hand"]
 
 
-# attaches session key in base64 to every POST to server
+# attaches public key in base64 to every POST to server
 # make sure to call this function when sending a POST
 # e.g. response = requests.post("http://localhost:3000/checkForWinner", json=prepareData())
 def prepareData(data=None):
 	if(data==None):
 		data = {}
-	data["session_key_base64"] = base64.b64encode(public_key).decode()
+	data["public_key_base64"] = base64.b64encode(public_key).decode()
 	return data
 
 def main():

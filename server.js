@@ -5,8 +5,8 @@ var express = require("express"),
 
 function Player()
 {
-  this.session_key= 0;//the key actually used for encryption
-  this.session_key_base64=0;
+  this.public_key= 0;//the key actually used for encryption
+  this.public_key_base64=0;
   this.hand = [];
   this.card1 = "";
   this.card2 = "";
@@ -58,14 +58,14 @@ app.post("/sendCard", function (req,res) {
         player.card3 = cardPlayed;
       } else {
         console.log("INVALID ROUND");
-        res.status(500).send(encrypt(player.session_key, JSON.stringify({err: "INVALID ROUND"})));
+        res.status(500).send(encrypt(player.public_key, JSON.stringify({err: "INVALID ROUND"})));
 
       }
       player.hand.splice(index,1); //remove played card from hand
-      res.status(200).send(encrypt(player.session_key, JSON.stringify({hand: player.hand, msg: checkWinner(player)})))
+      res.status(200).send(encrypt(player.public_key, JSON.stringify({hand: player.hand, msg: checkWinner(player)})))
     } else {
       console.log("INVALID CARD");
-      res.status(500).send(encrypt(player.session_key, JSON.stringify({err: "INVALID CARD"})));
+      res.status(500).send(encrypt(player.public_key, JSON.stringify({err: "INVALID CARD"})));
 
     }
   } else {
@@ -80,7 +80,7 @@ app.post("/checkForWinner", function (req,res) {
   console.log("POST /checkForWinner");
   var player = verify_user(req);
   if(player) {
-    res.status(200).send(encrypt(player.session_key, JSON.stringify({msg: checkWinner(player)})))
+    res.status(200).send(encrypt(player.public_key, JSON.stringify({msg: checkWinner(player)})))
   } else {
     console.log("INVALID PLAYER");
     res.status(500).json({err:"INVALID PLAYER"});
@@ -91,7 +91,7 @@ app.post("/getOpponentsCard", function (req,res) {
   console.log("POST /getOpponentsCard");
   var player = verify_user(req);
   if(player) {
-    res.status(200).send(encrypt(player.session_key, JSON.stringify({opponentCard: getOpponentsCard(player)})))
+    res.status(200).send(encrypt(player.public_key, JSON.stringify({opponentCard: getOpponentsCard(player)})))
   } else {
     console.log("INVALID PLAYER");
     res.status(500).json({err:"INVALID PLAYER"});
@@ -142,7 +142,7 @@ function checkWinner(player) {
   if(winner == 0) {// 0 means tie
     incrementRound();
     return "You Tied"
-  } else if(winner.session_key_base64 == player.session_key_base64) {
+  } else if(winner.public_key_base64 == player.public_key_base64) {
     incrementRound();
     if((round >= 3 && roundCounter == 1) || round >= 4)
       return "You Won The Game! Congratulations!";
@@ -169,12 +169,12 @@ function getWinner(player1Card, player2Card) {
   }
 }
 
-//input is session_key in base64 output. function checks which player is talking to server, returns 0
+//input is public_key in base64 output. function checks which player is talking to server, returns 0
 function verify_user(req) {
   var playerNumber = 0;
-  if(player1.session_key_base64 === req.body.session_key_base64) {
+  if(player1.public_key_base64 === req.body.public_key_base64) {
     playerNumber = player1;
-  } else if(player2.session_key_base64 === req.body.session_key_base64) {
+  } else if(player2.public_key_base64 === req.body.public_key_base64) {
     playerNumber = player2;
   }
   return playerNumber;
@@ -187,21 +187,21 @@ function encrypt(public_key, data) {
 }
 
 
-//input is session key, output is player's hand
+//input is public key, output is player's hand
 app.post('/login', function (req, res){
-  if(player1.session_key === 0) {
-    player1.session_key_base64 = req.body.session_key_base64;
-    player1.session_key = new Buffer(req.body.session_key_base64, 'base64').toString("ascii");
+  if(player1.public_key === 0) {
+    player1.public_key_base64 = req.body.public_key_base64;
+    player1.public_key = new Buffer(req.body.public_key_base64, 'base64').toString("ascii");
     player1.hand = generateHand();
     console.log("Player 1 logged in the game!");
-    res.status(200).send(encrypt(player1.session_key,JSON.stringify(player1.hand)));
+    res.status(200).send(encrypt(player1.public_key,JSON.stringify(player1.hand)));
   }
-  else if (player2.session_key === 0) {
-    player2.session_key_base64 = req.body.session_key_base64;
-    player2.session_key = new Buffer(req.body.session_key_base64, 'base64').toString("ascii");
+  else if (player2.public_key === 0) {
+    player2.public_key_base64 = req.body.public_key_base64;
+    player2.public_key = new Buffer(req.body.public_key_base64, 'base64').toString("ascii");
     player2.hand = generateHand();
     console.log("Player 2 logged in the game!");
-    res.status(200).send(encrypt(player2.session_key,JSON.stringify(player2.hand)));
+    res.status(200).send(encrypt(player2.public_key,JSON.stringify(player2.hand)));
   } else {
     res.status(500).send(JSON.stringify({err: "INVALID PLAYER"}));
 
