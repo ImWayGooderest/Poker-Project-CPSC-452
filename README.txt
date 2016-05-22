@@ -14,11 +14,21 @@ Akash - Documentation
 Michael - Documentation
 Trevor - Documentation
 
-How to run the program:
+How to run the server:
 To properly have the server installed, please click on the following link and following the instructions called "Building a node-box"
 https://github.com/ProfAvery/node-box
 
-While in Git Bash, be sure to clone the repository in the node-box/shared folder using the following link.
+Once connected to the VM be sure to clone the repository in the node-box/shared folder using the following link.
 https://github.com/ImWayGooderest/Poker-Project-CPSC-452
 
-To run the server on git bash type in "node server" while in the same directory as where you cloned the project. If a message pop ups saying "Pker Project app listening on port 3000!" pops up, then the server is up and running. Then you may procede to running two client programs for both players. Enjoy! :*)
+cd into Poker-Project-CPSC-452 and run the command: npm install
+
+Then start the server using the command: node server.js
+
+Running the program:
+Once the server is running, open up a second command prompt and navigate to the folder Poker-Project-CPSC-452/client
+
+run the client program: python client.py
+
+Note: Two clients must connect to the server to successfully play a game.
+
